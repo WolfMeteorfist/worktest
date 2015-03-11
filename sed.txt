@@ -1,0 +1,72 @@
+sed相关笔记：
+参数:
+-n（或者--quiet --silent)  
+不自动打印模式空间（sed通常会读入一行，放入到一个叫pattern space「模式空间」_(:з」∠)_）;
+
+-e 'scripts'  
+指定编辑命令，或者叫做脚本，就是一要执行的sed所支持的编辑命令。主要是「模式匹配」和「文本替换」，「插入」，「删除」之类的编辑操作。
+example: sed -e '=' -e 'p' -e 's/great/poor/' test.txt
+'='是打印行号; 'p':print打印这一行; 's':swap,替换
+(ง •̀_•́)ง   //对模式空间内容的改动，对原文件没有影响
+
+-f script-file 
+执行指定的文件中的脚本.也就是不把编辑命令放在命令行中,而是放在一个文件里面.让sed取执行文件里面的命令.
+
+-i[Suffix] --in-place[=Suffix] #科普:Suffix:后缀.
+用法：sed -i.bak -e 's/great/poor/g' test.txt
+生成文件 test.txt.bak来备份原文件.(test.txt被改. test.txt.bak未改).
+
+编辑命令的格式:
+sed -n -e '1 p' test.txt
+只打印第一行. '2,3 p' 第二三行打印. '4,+5 p'打印第四行到接下来第五行。
+'2p; 6p' 打印第2and第6 行
+
+模式匹配
+[/pattern1/],[/pattern2/]
+example:
+sed -n -e '/great/ p' test.txt
+sed -n -e '/great/=' -e '/great/p' test.txt
+
+zyc@zyc-All-Series:~/worktest$sed -n -e '/great/, /poor/ p' test.txt
+great
+1111
+poor
+great
+2222
+poor
+#其中poor和great之间的未被打印
+如果仅指定一个匹配,则会在所有匹配的行为执行编辑命令,如果指定二个,则是第一个匹配pattern1的行到,第一次匹配pattern2的行.
+
+正则表达式:
+位置符：
+    ^---行首
+    $---行尾
+    .---任意非换行符'\n'符
+    \b--- 一个单词结尾,单词定义为一连串的字母或数字，可以单独放在一端，也可放二端.
+限量符:
+    {m} .
+    \+---1个或多个
+    {m,n}--出现m次到n次
+    {m}--出现m次
+转义符
+    \   可以转义特殊字符
+字符集
+    []   其内的任意字符
+    \n	 前面第n个组合,/123\1/  则匹配123123
+
+也可以匹配追加
+example: sed -i -e '/jjj 444 kkk/ a \test test test' txt
+	 sed -i -e '/jjj 444 kkk/ a \test1\test2\test3' txt
+	 默认加入一行就转行,不用加\n.
+
+line1[,line2] s/pattern/replace/[opts] 替换把指定的行内的pattern替换为replace.
+By default,the only first pattern will be replaced.
+[opts]:  n  替换行内第n个pattern为replace
+	 g  替换行内所有的pattern为replace
+	 p  打印这一行，如果替换成功的话.
+
+line1[,line2] c text 把指定的行完整的替换为text
+sed -e '1, 3 c abcd' test.txt
+p 打印！！！！！！！！！！！！！！！！！！
+= 打印行号！！！！！！！！！！！！！！！！
+    
